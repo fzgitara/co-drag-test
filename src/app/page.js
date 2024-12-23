@@ -1,95 +1,92 @@
+'use client';
+
 import Image from "next/image";
 import styles from "./page.module.css";
+import { useState } from "react";
 
 export default function Home() {
+
+  const groups = ["available", "selected"];
+  const [options, setOptions] = useState([
+    { id: 1, group: groups[0], value: "Sales Cloud"},
+    { id: 2, group: groups[0], value: "Service Cloud"},
+    { id: 3, group: groups[0], value: "Community Cloud"},
+    { id: 4, group: groups[0], value: "Financial Cloud"},
+    { id: 5, group: groups[0], value: "Eintstein AI"},
+    { id: 6, group: groups[0], value: "Wave Analytics"},
+    { id: 7, group: groups[0], value: "Health Cloud"}
+  ]);
+
+  const [dragging, setDragging] = useState();
+
+  const handleDragStart = e => {
+    setDragging(e.target);
+  };
+
+  const handleDragEnter = (e, group) => {
+    let updatedOptions = [...options];
+    updatedOptions[dragging.id - 1].group = group;
+    setOptions(updatedOptions);
+  };
+
   return (
     <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>src/app/page.js</code>.
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+      <div className={styles.selectedBox} >
+        {options.map(option => {
+          if (option.group === "selected") {
+            return (
+              <div className={styles.selectedOptionBox} key={option.id}>
+                {option.value}
+              </div>
+            )
+          }
+        })}
+      </div>
 
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
+      <div className={styles.optionsContainer}>
+        <div
+          className={styles.availableOptionsContainer}  
+          onDragEnter={e => handleDragEnter(e, "available")}
+        >
+          <h4>Available Options</h4>
+          {options.map(option => {
+            if (option.group === "available") {
+              return (
+                <div
+                  key={option.id}
+                  id={option.id}
+                  className={styles.availableOptionContainer}
+                  draggable
+                  onDragStart={e => handleDragStart(e)}
+                >
+                  {option.value}
+                </div>
+              )
+            }
+          })}
         </div>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+        <div
+          className={styles.selectedOptionsContainer}
+          onDragEnter={e => handleDragEnter(e, "selected")}
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          <h4>Selected Options</h4>
+          {options.map(option => {
+            if (option.group === "selected") {
+              return (
+                <div
+                  key={option.id}
+                  id={option.id}
+                  className={styles.selectedOptionContainer}
+                  draggable
+                  onDragStart={e => handleDragStart(e)}
+                >
+                  {option.value}
+                </div>
+              )
+            }
+          })}
+        </div>
+      </div>
     </div>
   );
 }
