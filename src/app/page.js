@@ -1,6 +1,5 @@
 'use client';
 
-import Image from "next/image";
 import styles from "./page.module.css";
 import { useState } from "react";
 
@@ -16,16 +15,26 @@ export default function Home() {
     { id: 6, group: groups[0], value: "Wave Analytics"},
     { id: 7, group: groups[0], value: "Health Cloud"}
   ]);
-
-  const [dragging, setDragging] = useState();
+  const [dragStartId, setDragStartId] = useState();
+  const [dragEnterId, setDragEnterId] = useState();
 
   const handleDragStart = e => {
-    setDragging(e.target);
+    const dragId = Number(e.target.id)
+    setDragStartId(dragId);
   };
 
-  const handleDragEnter = (e, group) => {
+  const handleDragEnter = group => {
     let updatedOptions = [...options];
-    updatedOptions[dragging.id - 1].group = group;
+    const indexDragStart =
+      updatedOptions.findIndex(option => option.id === dragStartId);
+    const indexDragEnter =
+      updatedOptions.findIndex(option => option.id === dragEnterId);
+
+    updatedOptions[indexDragStart].group = group;
+    const optionMove = updatedOptions[indexDragStart];
+    updatedOptions.splice(indexDragStart, 1);
+    updatedOptions.splice(indexDragEnter - 1, 0 , optionMove);
+
     setOptions(updatedOptions);
   };
 
@@ -46,7 +55,7 @@ export default function Home() {
       <div className={styles.optionsContainer}>
         <div
           className={styles.availableOptionsContainer}  
-          onDragEnter={e => handleDragEnter(e, "available")}
+          onDragEnter={() => handleDragEnter("available")}
         >
           <h4>Available Options</h4>
           {options.map(option => {
@@ -58,6 +67,7 @@ export default function Home() {
                   className={styles.availableOptionContainer}
                   draggable
                   onDragStart={e => handleDragStart(e)}
+                  onDragEnter={() => setDragEnterId(option.id)}
                 >
                   {option.value}
                 </div>
@@ -67,7 +77,7 @@ export default function Home() {
         </div>
         <div
           className={styles.selectedOptionsContainer}
-          onDragEnter={e => handleDragEnter(e, "selected")}
+          onDragEnter={() => handleDragEnter("selected")}
         >
           <h4>Selected Options</h4>
           {options.map(option => {
@@ -79,6 +89,7 @@ export default function Home() {
                   className={styles.selectedOptionContainer}
                   draggable
                   onDragStart={e => handleDragStart(e)}
+                  onDragEnter={() => setDragEnterId(option.id)}
                 >
                   {option.value}
                 </div>
